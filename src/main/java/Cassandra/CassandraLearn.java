@@ -5,7 +5,7 @@ public class CassandraLearn {
         System.out.println("Hello World!"); // Display the string.
         CassandraSQL c = new CassandraSQL();
         c.Init();
-        c.AddRetroScan();
+   //   c.AddRetroScan();
         c.SampleRead();
         c.Shutdown();
     //    c.workWithKeySpace();

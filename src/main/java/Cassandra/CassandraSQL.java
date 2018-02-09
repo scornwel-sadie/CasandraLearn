@@ -5,14 +5,16 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 
-import java.util.UUID;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class CassandraSQL {
     String serverIP = "127.0.0.1";
     String keyspace = "casb_data_security_core_keyspace";
     private Cluster cluster = null;
     private Session session = null;
-
+    private List<ScanClass> theData = new ArrayList<ScanClass>();
 
     public boolean Init(){
 
@@ -28,16 +30,84 @@ public class CassandraSQL {
     public void AddRetroScan(){
         UUID uuid = UUID.randomUUID();
         String sqlUuid = uuid.toString();
-        String cqlStatement = "insert into tenant_dlpscan_daily_counter (tenantid, trigger, date,allowed_limit,object_counter,scanned_counter ) values (df21cbbf-6ae4-4ed5-aa65-827f994a9a86, 'carol','02-05-2017',0,2,900)";
 
-        session.execute(cqlStatement);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy'T'HH");
+
+        Date dt = new Date();
+        String today = sdf.format(dt);
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        c.add(Calendar.DATE, 1);
+        dt = c.getTime();
+        today = sdf.format(dt);
+
+        String cqlStatement = "";
+
+        for(int i =0; i<50; i++){
+          //  System.out.println("The date is " + today);
+        //    Calendar c = Calendar.getInstance();
+            c.setTime(dt);
+            c.add(Calendar.DATE, i);
+            dt = c.getTime();
+            today = sdf.format(dt);
+        //    System.out.println("The date is " + today);
+            cqlStatement = "insert into tenant_dlpscan_daily_counter " +
+                     "(tenantid, trigger, date,allowed_limit,object_counter,scanned_counter ) values" +
+                    "(df21cbbf-6ae4-4ed5-aa65-827f994a9a86, 'RETROSCANMETERING','" + today  +"',0,2,900)";
+            session.execute(cqlStatement);
+
+        }
+
+
+
+
         int smitty = 45;
     }
+
+    private DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
     public void SampleRead(){
-        String cqlStatement = "SELECT * FROM tenant_dlpscan_daily_counter where trigger = 'RETROSCANMETERING'ALLOW FILTERING ";
+        String cqlStatement = "SELECT tenantid,trigger,date FROM tenant_dlpscan_daily_counter where trigger = 'RETROSCANMETERING'ALLOW FILTERING ";
         for (Row row : session.execute(cqlStatement)) {
-            System.out.println(row.toString());
+            UUID id = row.getUUID(0);
+            String trigger = row.getString(1);
+            String date = row.getString(2);
+            ScanClass theScan = new ScanClass();
+            theScan.setUUID(id);
+            theScan.setscanType(trigger);
+            theScan.setDate(date);
+            theData.add(theScan);
+
+
+
+           // System.out.println(row.toString());
         }
+
+
+
+        try{
+            Date purgeDate  = format.parse("01-01-2022");
+            Collections.sort(theData, ScanClass.ScanDateComparator);
+            for(ScanClass str: theData){
+                Date scanDate = str.getRawDate();
+
+                if(scanDate.before(purgeDate)){
+                    System.out.println(str);
+                    cqlStatement = "delete from tenant_dlpscan_daily_counter where tenantid = " + str.getUID() + " and date = '";
+                    cqlStatement = cqlStatement + str.getDate()  +"' and trigger = '" + str.getscanType() + "'";
+                    System.out.println(cqlStatement);
+                    session.execute(cqlStatement);
+                    int k=45;
+                }
+            }
+        }catch(Exception here){
+            System.out.println(here.getMessage());
+        }
+
+
+
+
+        int smitty = 45;
     }
 
     public void Shutdown(){
