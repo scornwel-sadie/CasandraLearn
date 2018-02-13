@@ -32,27 +32,28 @@ public class CassandraSQL {
         String sqlUuid = uuid.toString();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy'T'HH");
-
-        Date dt = new Date();
-        String today = sdf.format(dt);
-
         Calendar c = Calendar.getInstance();
+        Date dt = new Date();
+        /*String today = sdf.format(dt);
+
+
         c.setTime(dt);
         c.add(Calendar.DATE, 1);
         dt = c.getTime();
         today = sdf.format(dt);
 
-        String cqlStatement = "";
+        String cqlStatement = "";*/
 
-        for(int i =0; i<50; i++){
+        for(int i =0; i<200; i++){
           //  System.out.println("The date is " + today);
         //    Calendar c = Calendar.getInstance();
+            dt = new Date();
             c.setTime(dt);
             c.add(Calendar.DATE, i);
             dt = c.getTime();
-            today = sdf.format(dt);
+            String today = sdf.format(dt);
         //    System.out.println("The date is " + today);
-            cqlStatement = "insert into tenant_dlpscan_daily_counter " +
+            String cqlStatement = "insert into tenant_dlpscan_daily_counter " +
                      "(tenantid, trigger, date,allowed_limit,object_counter,scanned_counter ) values" +
                     "(df21cbbf-6ae4-4ed5-aa65-827f994a9a86, 'RETROSCANMETERING','" + today  +"',0,2,900)";
             session.execute(cqlStatement);
@@ -85,11 +86,13 @@ public class CassandraSQL {
 
 
 
+
         try{
             Date purgeDate  = format.parse("01-01-2022");
             Collections.sort(theData, ScanClass.ScanDateComparator);
             for(ScanClass str: theData){
                 Date scanDate = str.getRawDate();
+                System.out.println(scanDate);
 
                 if(scanDate.before(purgeDate)){
                     System.out.println(str);
@@ -103,6 +106,7 @@ public class CassandraSQL {
         }catch(Exception here){
             System.out.println(here.getMessage());
         }
+
 
 
 
