@@ -12,6 +12,7 @@ public class ScanClass {
     private String scanType = "";
     private Date rowDate = null;
     private DateFormat format = new SimpleDateFormat("dd-MM-yyyy'T'HH");
+
     public void setUUID(UUID theId){
         this.theId = theId;
     }
@@ -21,7 +22,9 @@ public class ScanClass {
     }
 
     public UUID getUID(){
-        return this.theId;
+
+
+          return this.theId;
     }
 
     public void setscanType(String scanType){
