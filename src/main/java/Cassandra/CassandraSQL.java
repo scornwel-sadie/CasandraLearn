@@ -16,6 +16,14 @@ public class CassandraSQL {
     private Session session = null;
     private List<ScanClass> theData = new ArrayList<ScanClass>();
 
+    public CassandraSQL() {
+
+    }
+/* constructor used for unit test */
+    public CassandraSQL(Session session) {
+        this.session = session;
+    }
+
     public boolean Init(){
 
         cluster = Cluster.builder()
