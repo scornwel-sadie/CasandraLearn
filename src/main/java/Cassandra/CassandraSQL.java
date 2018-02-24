@@ -42,6 +42,13 @@ public class CassandraSQL {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy'T'HH");
         Calendar c = Calendar.getInstance();
         Date dt = new Date();
+
+       String cqlStatement = "insert into tenant_dlpscan_daily_counter " +
+                "(tenantid, trigger, date,allowed_limit,object_counter,scanned_counter ) values" +
+                "(af21cbbf-6ae4-4ed5-aa65-827f994a9a86, 'RETROSCAN','02-04010`7T08',0,2,900)";
+
+        session.execute(cqlStatement);
+
         /*String today = sdf.format(dt);
 
 
@@ -57,13 +64,13 @@ public class CassandraSQL {
         //    Calendar c = Calendar.getInstance();
             dt = new Date();
             c.setTime(dt);
-            c.add(Calendar.DATE, i);
+            c.add(Calendar.DATE, i*-1);
             dt = c.getTime();
             String today = sdf.format(dt);
-        //    System.out.println("The date is " + today);
-            String cqlStatement = "insert into tenant_dlpscan_daily_counter " +
+            cqlStatement = "insert into tenant_dlpscan_daily_counter " +
                      "(tenantid, trigger, date,allowed_limit,object_counter,scanned_counter ) values" +
                     "(df21cbbf-6ae4-4ed5-aa65-827f994a9a86, 'RETROSCANMETERING','" + today  +"',0,2,900)";
+            //    System.out.println("The date is " + today);
             session.execute(cqlStatement);
 
         }
